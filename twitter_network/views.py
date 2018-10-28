@@ -6,5 +6,6 @@ from django.conf import settings as conf_settings
 
 def index(request):
     file = open(os.path.join(conf_settings.BASE_DIR, 'test_data.csv'))
-    ana = analyse(file, 400, 400)
+    ana = analyse(file, 1000, 700)
+    ana = list(ana)
     return render(request, 'twitter_network/index.html', {'ana': ana})

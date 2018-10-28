@@ -137,7 +137,7 @@ def analyse(csv_file, width, height):
 
     # In[742]:
 
-    def scatter_nodes(pos, labels=None, color=None, colorScale='Greens', showScale=False, size=15, opacity=1):
+    def scatter_nodes(pos, labels=None, color=None, colorScale='Greens', showScale=False, size=15, opacity=1,bar_title=''):
         # pos is the dict of node positions
         # labels is a list  of labels of len(pos), to be displayed when hovering the mouse over the nodes
         # color is the color for nodes. When it is set as None the Plotly default color is used
@@ -160,7 +160,7 @@ def analyse(csv_file, width, height):
                               size=size,
                               colorbar=dict(
                                   thickness=15,
-                                  title='Betweeenness Centrality',
+                                  title=bar_title,
                                   xanchor='left',
                                   titleside='right'
                               ),
@@ -220,33 +220,33 @@ def analyse(csv_file, width, height):
 
     def plot_betweeness_centralities():
         trace1 = scatter_edges(G, pos)
-        trace2 = scatter_nodes(pos, color=betweenessCentralScore, showScale=True, labels=labels)
+        trace2 = scatter_nodes(pos, color=betweenessCentralScore, showScale=True, labels=labels, bar_title='Betweeenness Centrality')
         data = [trace1, trace2]
 
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
-                                    'layout': layout}, include_plotlyjs=True, output_type='div')
+                                    'layout': layout}, include_plotlyjs=False, output_type='div')
 
     def plot_degrees_centralities():
         trace1 = scatter_edges(G, pos)
-        trace2 = scatter_nodes(pos, color=degreeCentralScore, showScale=True, labels=labels)
+        trace2 = scatter_nodes(pos, color=degreeCentralScore, showScale=True, labels=labels, bar_title='Degree Centrality')
         data = [trace1, trace2]
 
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
-                                    'layout': layout}, include_plotlyjs=True, output_type='div')
+                                    'layout': layout}, include_plotlyjs=False, output_type='div')
 
     def plot_page_rank():
         trace1 = scatter_edges(G, pos)
-        trace2 = scatter_nodes(pos, color=pageRankScore, showScale=True, labels=labels)
+        trace2 = scatter_nodes(pos, color=pageRankScore, showScale=True, labels=labels, bar_title='PageRank')
         data = [trace1, trace2]
 
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
-                                    'layout': layout}, include_plotlyjs=True, output_type='div')
+                                    'layout': layout}, include_plotlyjs=False, output_type='div')
 
     def plot_communites():
         trace1 = scatter_edges(G, pos)
@@ -255,7 +255,7 @@ def analyse(csv_file, width, height):
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
-                                    'layout': layout}, include_plotlyjs=True, output_type='div')
+                                    'layout': layout}, include_plotlyjs=False, output_type='div')
 
     def plot_correlation_heat_map():
         trace = Heatmap(z=np.array(correlations),
@@ -267,7 +267,7 @@ def analyse(csv_file, width, height):
                         zmax=1)
         data = [trace]
         fig = Figure(data=data)
-        return plotly.offline.plot({'data': data}, include_plotlyjs=True, output_type='div')
+        return plotly.offline.plot({'data': data}, include_plotlyjs=False, output_type='div')
 
     plot_betweeness_centralities = plot_betweeness_centralities()
     plot_degrees_centralities = plot_degrees_centralities()
