@@ -222,7 +222,7 @@ def analyse(csv_file, width, height):
         trace1 = scatter_edges(G, pos)
         trace2 = scatter_nodes(pos, color=betweenessCentralScore, showScale=True, labels=labels, bar_title='Betweeenness Centrality')
         data = [trace1, trace2]
-
+        layout.title = 'Betweeenness Centrality'
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
@@ -232,7 +232,7 @@ def analyse(csv_file, width, height):
         trace1 = scatter_edges(G, pos)
         trace2 = scatter_nodes(pos, color=degreeCentralScore, showScale=True, labels=labels, bar_title='Degree Centrality')
         data = [trace1, trace2]
-
+        layout.title = 'Degree Centrality'
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
@@ -242,7 +242,7 @@ def analyse(csv_file, width, height):
         trace1 = scatter_edges(G, pos)
         trace2 = scatter_nodes(pos, color=pageRankScore, showScale=True, labels=labels, bar_title='PageRank')
         data = [trace1, trace2]
-
+        layout.title= 'PageRank'
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
@@ -252,6 +252,7 @@ def analyse(csv_file, width, height):
         trace1 = scatter_edges(G, pos)
         trace2 = scatter_nodes(pos, color=partition, colorScale='Viridis', labels=labels)
         data = [trace1, trace2]
+        layout.title="Community detection"
         fig = Figure(data=data, layout=layout)
         fig['layout'].update(annotations=make_annotations(pos, labels))
         return plotly.offline.plot({'data': data,
@@ -267,7 +268,8 @@ def analyse(csv_file, width, height):
                         zmax=1)
         heatLayout = dict(width=width,
                           height=height,
-                          autosize=True)
+                          autosize=True,
+                          title='Centralities correlation heatmap')
         data = [trace]
         return plotly.offline.plot({'data': data, 'layout': heatLayout}, include_plotlyjs=False, output_type='div')
 
