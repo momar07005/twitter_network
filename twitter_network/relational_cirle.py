@@ -265,9 +265,11 @@ def analyse(csv_file, width, height):
                         reversescale=True,
                         zmin=0,
                         zmax=1)
+        heatLayout = dict(width=width,
+                          height=height,
+                          autosize=True)
         data = [trace]
-        fig = Figure(data=data)
-        return plotly.offline.plot({'data': data}, include_plotlyjs=False, output_type='div')
+        return plotly.offline.plot({'data': data, 'layout': heatLayout}, include_plotlyjs=False, output_type='div')
 
     plot_betweeness_centralities = plot_betweeness_centralities()
     plot_degrees_centralities = plot_degrees_centralities()
