@@ -13,11 +13,11 @@
     <!-- Nav tabs -->
 
     <ul class="nav nav-tabs nav-justified">
-        {% for id in n %}
+        {% for id, plot in plot_list %}
 
             <li class="nav-item">
                 <a class="nav-link {% if id == 1 %}active{% endif %}" data-toggle="tab"
-                   href="#aa{{ id }}">Figure {{ id }}</a>
+                   href="#aa{{ id }}">{{ plot.0 }}</a>
             </li>
         {% endfor %}
     </ul>
@@ -26,7 +26,7 @@
     <div class="tab-content">
         {% for id, plot in plot_list %}
             <div class="tab-pane container {% if id == 1 %}active{% else %}fade{% endif %}" id="aa{{ id }}">
-                {% autoescape off %}{{ plot }}{% endautoescape %}
+                {% autoescape off %}{{ plot.1 }}{% endautoescape %}
             </div>
         {% endfor %}
     </div>
