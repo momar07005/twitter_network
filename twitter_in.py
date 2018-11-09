@@ -1,13 +1,7 @@
 
 # coding: utf-8
-
-
-
-
-#Import librairies
-
+# Import librairies
 import tweepy
-import csv
 import pandas as pd
 import time
 import sys
@@ -16,11 +10,11 @@ import json
 import requests
 from requests_oauthlib import OAuth1
 
+import os
+from django.conf import settings as conf_settings
 
 
-
-# login to Twitter API 
-
+# login to Twitter API
 def login():
     
     CONSUMER_KEY = "ltjPz1qv9zq32qA2qHN2Oypxb"
@@ -77,7 +71,6 @@ def save_in_csv(results_search):
     return df
     
 
-
 def generate_node(twitter_api, df):
     
     # Create a list of the unique usernames in order to see which users we need to retrieve friends for.
@@ -118,11 +111,8 @@ def generate_node(twitter_api, df):
         
     return dfUsers
     
-    
-
 
 # Retrieve some additionnals informations for each user
-
 def get_infos_node(df):
     
     # Create a list of the unique usernames in order to see which users we need to retrieve friends for.
@@ -140,43 +130,29 @@ def get_infos_node(df):
         json.dump(additional_information, write_file)
     
 
-def get_datas(q , max_result = 100):
+def get_data(q, max_result=100):
 
     twitter_api, auth = login()
 
-
     search = twitter_search(twitter_api, q, max_result)
-
 
     df = save_in_csv(search)
 
-
-
     dfUsers = generate_node(twitter_api, df)
 
-
-    # Again, to limit the number of calls to Twitter API, just do lookups on followers that connect to those in our user group.
+    # Again, to limit the number of calls to Twitter API, just do lookups on followers that connect
+    # to those in our user group.
     # We are not interested in "friends" that are not part of this community.
     fromId = dfUsers['userFromId'].unique()
     dfChat = dfUsers[dfUsers['userToId'].apply(lambda x: x in fromId)]
-
-
 
     # No more Twitter API lookups are necessary. Create a lookup table that we will use to get the verify the userToName
     dfLookup = dfChat[['userFromName','userFromId']]
     dfLookup = dfLookup.drop_duplicates()
     dfLookup.columns = ['userToName','userToId']
     dfCommunity = dfUsers.merge(dfLookup, on='userToId')
-
-
     dfCommunity.to_csv('dfCommunity.csv',index = False,encoding='utf-8')
-
-
-
     df = pd.read_csv('dfCommunity.csv')
-
-
-
     for x in range(len(df)):
         try:
             mask = (df["userFromName"] == df.iloc[x][3]) & (df["userToName"] == df.iloc[x][0])
@@ -184,28 +160,16 @@ def get_datas(q , max_result = 100):
                 df.drop(df[mask].index[0],inplace=True)
         except:
             continue
-            
-
 
     # For each user retrieve the 100 last fav
-
     root_url = 'https://api.twitter.com/1.1/favorites/list.json?count=100&screen_name='
-
     all_names = df["userFromName"].unique()
-
     i = 0
-
     for screen_name in all_names:
-        
         url = root_url + screen_name
-
         rq = requests.get(url,auth=auth)
-
         data = rq.json()
-
         tempon = len(data)
-
-
         for x in range(tempon):
 
             if data[x]["user"]["id"] in list(df["userToId"]):
@@ -217,14 +181,12 @@ def get_datas(q , max_result = 100):
 
         url = ''
 
-        i  += 1
+        i += 1
         sys.stdout.write("\r {0}. {1}".format(i,screen_name))
         sys.stdout.flush()
         time.sleep(5)
             
-
-    df.to_csv('data_make_graph.csv', index=False, encoding='utf-8')
-
+    df.to_csv(os.path.join(conf_settings.BASE_DIR, 'test_data.csv'), index=False, encoding='utf-8')
     print(" Youpi ! les données sont pretes ...")
 
 
