@@ -98,7 +98,9 @@ def analyse(csv_file, width, height):
 
     for nd in nodeID:
         user_name = G.node[nd]['userName']
-        labels.append(user_name)
+        # Here you are going to change the url and add a parameter username [GET]
+        label =  "<a href='#'> "+ user_name +"</a>"
+        labels.append(label)
 
     # ## Configure the plot and call Plotly
     width = width
