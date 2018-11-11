@@ -64,7 +64,7 @@ def save_in_csv(results_search):
     df['text'] = text
     
     # Write out Tweets
-    df.to_csv('user_tweet.csv',index = False,encoding='utf-8')
+    df.to_csv('user_tweet.csv', index=False, encoding='utf-8')
     
     print("---------------------- Well saved in user_tweet.csv ----------------------")
     
@@ -99,7 +99,7 @@ def generate_node(twitter_api, df):
         dfTemp['userFromName'] = currentName
         dfTemp['userFromId'] = currentId
         dfTemp['userToId'] = currentFriends
-        dfUsers = pd.concat([dfUsers,dfTemp])
+        dfUsers = pd.concat([dfUsers, dfTemp])
         time.sleep(30) # avoids hitting Twitter rate limit
         # Progress bar to track approximate progress
         count +=1
@@ -122,8 +122,8 @@ def get_infos_node(df):
     
     for name in all_names:
         source = twitter_api.get_user(screen_name='TL_Gendarmerie')
-        additional_information[source.id] = [ source.screen_name , source.followers_count, source.friends_count ,
-                                              source.location , source.profile_image_url ]
+        additional_information[source.id] = [source.screen_name, source.followers_count, source.friends_count,
+                                             source.location, source.profile_image_url]
    
     additional_information = json.dumps(additional_information, indent=4)
     with open("node_infos.json", "w") as write_file:
@@ -157,7 +157,7 @@ def get_data(q, max_result=100):
         try:
             mask = (df["userFromName"] == df.iloc[x][3]) & (df["userToName"] == df.iloc[x][0])
             if not df[mask].empty:       
-                df.drop(df[mask].index[0],inplace=True)
+                df.drop(df[mask].index[0], inplace=True)
         except:
             continue
 
@@ -167,7 +167,7 @@ def get_data(q, max_result=100):
     i = 0
     for screen_name in all_names:
         url = root_url + screen_name
-        rq = requests.get(url,auth=auth)
+        rq = requests.get(url, auth=auth)
         data = rq.json()
         tempon = len(data)
         for x in range(tempon):
