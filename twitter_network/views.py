@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-<<<<<<< HEAD
+
 from .relational_cirle import analyse
 
 #Remove the comment below to use my module
 #from .twitter_process_data import get_data
-=======
-from .models import *
->>>>>>> 92feb78dbc814b0d80e389537082bf23c2d11beb
+
 import os
 from django.conf import settings as conf_settings
 
