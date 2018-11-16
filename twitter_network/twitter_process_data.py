@@ -1,6 +1,3 @@
-
-# coding: utf-8
-# Import librairies
 import tweepy
 import pandas as pd
 import time
@@ -11,16 +8,20 @@ import requests
 from requests_oauthlib import OAuth1
 
 import os
+
 from django.conf import settings as conf_settings
+
+from twitter_network.models import UserTweet, UserInfo
+
 
 
 # login to Twitter API
 def login():
     
-    CONSUMER_KEY = "ltjPz1qv9zq32qA2qHN2Oypxb"
-    CONSUMER_SECRET = "RcIrQx9nkLj23HpVcSXNh0nbHcyyOk0rSfC4Klde1e7GhcATz6"
-    ACCESS_TOKEN = "1038381241836417024-6yKxd48G7VYWQGHYYn7PLzGIwCaZsq"
-    ACCESS_TOKEN_SECRET = "3p9RJ2Eb8Rpos2qpVzTKyy8Os75TwqJXXPhTFW4hYuoCy"
+    CONSUMER_KEY = "21N9hZTYEhZxT43r2auEf99Xz"
+    CONSUMER_SECRET = "uOzTAlvDaJoPvK4pPXLVWJMlpzotFrK5z8NF6BKrT7mTHFo0xW"
+    ACCESS_TOKEN = "1038381241836417024-4wXcS9N703LV9qFlJ8FQVYgwoHNhDF"
+    ACCESS_TOKEN_SECRET = "i15wlk1U6U46BP42e3C9qZuERemmOxurAnqFrqPOa7N55"
     
     OAUTH_KEYS = {'consumer_key':CONSUMER_KEY, 'consumer_secret':CONSUMER_SECRET,'access_token_key':ACCESS_TOKEN, 'access_token_secret':ACCESS_TOKEN_SECRET}
 
@@ -33,7 +34,7 @@ def login():
     auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
     
-    sys.stdout.write(" Connected ...")
+    sys.stdout.write("********************* Twitter API Connected *********************\n")
 
     return twitter_api, auth
 
@@ -47,31 +48,46 @@ def twitter_search(twitter_api, keyword, max_results=200):
     
 
 # Save search result in a csv file
-def save_in_csv(results_search):
+def save_in_db(results_search):
+
+    print("\nSaving tweets and owner ...")
     
     df = pd.DataFrame()
     
     user = [] # User who makes the tweet
     text = [] # Tweet content
+    user_id = []
     
     # We can add some additionals informations
     
     for tweet in results_search:
         user.append(tweet.user.screen_name)
         text.append(tweet.text)
+        user_id.append(tweet.user.id)
+        user_tweet = tweet.user.screen_name
+        user_text = tweet.text
+
+        u = UserTweet(screen_name=user_tweet, tweet_text=user_text)
+
+        u.save()
+
+        print("User: {} saved !!!".format(user_tweet))
         
     df['user'] = user
     df['text'] = text
+    df['user_id'] = user_id
     
     # Write out Tweets
-    df.to_csv('user_tweet.csv', index=False, encoding='utf-8')
+    #df.to_csv('user_tweet.csv', index=False, encoding='utf-8')
     
-    print("---------------------- Well saved in user_tweet.csv ----------------------")
+    print("\n---------------------- Well saved  ----------------------")
     
     return df
     
 
 def generate_node(twitter_api, df):
+
+    print("\n\r ... Get data from Twitter  ...")
     
     # Create a list of the unique usernames in order to see which users we need to retrieve friends for.
     all_names = list(df['user'].unique())
@@ -108,26 +124,40 @@ def generate_node(twitter_api, df):
         sys.stdout.flush()
         
     dfUsers["weight"] = 1
+
+    print("\n")
         
     return dfUsers
     
 
 # Retrieve some additionnals informations for each user
-def get_infos_node(df):
+def get_infos_node(twitter_api, df):
     
     # Create a list of the unique usernames in order to see which users we need to retrieve friends for.
-    all_names = list(df['user'].unique())
+    all_ids = list(df['user_id'].unique())
+
     
-    additional_information = dict()
-    
-    for name in all_names:
-        source = twitter_api.get_user(screen_name='TL_Gendarmerie')
-        additional_information[source.id] = [source.screen_name, source.followers_count, source.friends_count,
-                                             source.location, source.profile_image_url]
+    for ids in all_ids:
+        source = twitter_api.get_user(ids)
+
+        screen_name = source.screen_name
+        tweet_name = source.name
+        followings = source.friends_count
+        followers = source.followers_count
+        localisation = source.location
+        photo_profile = source.profile_image_url
+        profile_banner_url = source.profile_banner_url
+        favorites_count = source.favourites_count
+        tweets_count = source.statuses_count
+
+
+        u = UserInfo(screen_name=screen_name, tweet_name=tweet_name, followings=followings, followers=followers, favorites_count=favorites_count, tweets_count=tweets_count, localisation=localisation, photo_profile=photo_profile, profile_banner_url=profile_banner_url)
+            
+        u.save()
+
+
    
-    additional_information = json.dumps(additional_information, indent=4)
-    with open("node_infos.json", "w") as write_file:
-        json.dump(additional_information, write_file)
+
     
 
 def get_data(q, max_result=100):
@@ -136,7 +166,9 @@ def get_data(q, max_result=100):
 
     search = twitter_search(twitter_api, q, max_result)
 
-    df = save_in_csv(search)
+    df = save_in_db(search)
+
+    df_tempon = df
 
     dfUsers = generate_node(twitter_api, df)
 
@@ -182,11 +214,18 @@ def get_data(q, max_result=100):
         url = ''
 
         i += 1
-        sys.stdout.write("\r {0}. {1}".format(i,screen_name))
-        sys.stdout.flush()
+        print("\r {0}. {1}".format(i,screen_name))
+        #sys.stdout.flush()
         time.sleep(5)
             
     df.to_csv(os.path.join(conf_settings.BASE_DIR, 'test_data.csv'), index=False, encoding='utf-8')
+
+    get_infos_node(twitter_api, df_tempon)
+
     print(" Youpi ! les données sont pretes ...")
+
+
+
+
 
 
