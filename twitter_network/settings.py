@@ -82,7 +82,7 @@ DATABASES = {
         'PASSWORD': 'postgre',
         'HOST': '127.0.0.1',
         'PORT': '5432',
-        'NAME': 'twitter',
+        'NAME': 'twitter_network',
     }
 }
 

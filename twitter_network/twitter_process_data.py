@@ -223,3 +223,9 @@ def get_data(q, max_result=100):
     get_infos_node(twitter_api, df_tempon)
 
     print(" Youpi ! les données sont pretes ...")
+
+
+
+
+
+
