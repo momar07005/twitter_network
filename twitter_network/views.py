@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .relational_cirle import analyse
+
+#Remove the comment below to use my module
+#from .twitter_process_data import get_data
 import os
 from django.conf import settings as conf_settings
 
